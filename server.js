@@ -17,7 +17,7 @@ handleUncaughtException();
 import app from "./app.js";
 
 // Connect to DB and start server
-mongoose.connect(process.env.MONGO_LOCAL_STR, {})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     const PORT = process.env.PORT || 5000;
     const server = app.listen(PORT, () => {
