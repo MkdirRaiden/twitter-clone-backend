@@ -32,7 +32,7 @@ This is the **backend API** for a Twitter-style full-stack application, built wi
 ## 🧑‍💻 Project Structure
 
 ```
-backend/
+twitter-clone-backend/
 │
 ├── controllers/       # Route logic
 ├── routes/            # API endpoints
@@ -98,7 +98,7 @@ NODE_ENV=development
 
 ```bash
 git clone https://github.com/your-username/twitter-clone-backend.git
-cd backend
+cd twitter-clone-backend
 npm install
 npm run dev
 ```
