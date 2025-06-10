@@ -58,7 +58,7 @@ export const login = asyncHandler(async (req, res, next) => {
   const { value, error } = loginValidationSchema.validate(req.body || {});
   if (error) return next(error);
 
-  const user = await User.findOne({ email: value.email }).select("+password");
+  const user = await User.findOne({ username: value.username }).select("+password");
   if (!user || !(await user.comparePassword(value.password, user.password))) {
     return next(new CustomError("Invalid credentials", 400));
   }

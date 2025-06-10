@@ -5,7 +5,7 @@ import helmet from "helmet";
 import { xss } from "express-xss-sanitizer";
 import mongoSanitize from "express-mongo-sanitize";
 import rateLimit from "express-rate-limit";
-import morgan from "morgan";
+// import morgan from "morgan";
 
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
@@ -40,10 +40,10 @@ app.use(cookieParser());
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// Logging in development
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+// use in development only
+// if (process.env.NODE_ENV === "development") {
+//   app.use(morgan("dev"));
+// }
 
 // Routes
 app.use("/api/auth", authRoutes);

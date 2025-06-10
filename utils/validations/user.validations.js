@@ -19,11 +19,7 @@ export const signUpValidationSchema = Joi.object({
 
 // Login schema
 export const loginValidationSchema = Joi.object({
-    email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
-        .trim()
-        .lowercase()
-        .required(),
+    username: Joi.string().alphanum().trim().min(3).max(30).required(),
     password: Joi.string().alphanum().trim().required(),
 });
 
