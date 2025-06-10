@@ -7,6 +7,7 @@ import {
   commentOnPost,
   likeUnlikePost,
   getFollowingPosts,
+  getSuggestedPosts,
 } from "../controllers/post.controllers.js";
 
 const router = express.Router();
@@ -15,6 +16,7 @@ const router = express.Router();
 router.param("postId", checkPostId);
 
 router.get("/feed/following", protectRoute, getFollowingPosts);
+router.get("/feed/suggestions", protectRoute, getSuggestedPosts)
 //get all posts, create posts and delete post
 router.route("/").post(protectRoute, createPost);
 

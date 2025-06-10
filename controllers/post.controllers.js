@@ -68,13 +68,18 @@ export const deletePost = asyncHandler(async (req, res, next) => {
   sendPostResponse(res, 200, undefined, undefined, "Post deleted successfully!");
 });
 
-//  Get all posts
-export const getAllPosts = asyncHandler(async (req, res, next) => {
+//  Get all suggested posts
+export const getSuggestedPosts = asyncHandler(async (req, res, next) => {
+  const currentUser = await User.findById(req.user._id).select("following");
+
+  const excludedUserIds = [req.user._id, ...currentUser.following];
+
   const { posts, page, totalPages } = await runPaginatedQuery({
     model: Post,
-    filter: {},
+    filter: { user: { $nin: excludedUserIds } }, // Exclude followed users and self
     req,
     next,
+    sort: { createdAt: -1 }, // Newest first
     populate: [
       { path: "user", select: "-password" },
       { path: "comments.user", select: "-password" },
@@ -83,6 +88,7 @@ export const getAllPosts = asyncHandler(async (req, res, next) => {
 
   sendPostResponse(res, 200, undefined, posts, undefined, page, totalPages);
 });
+
 
 // Get following users' posts
 export const getFollowingPosts = asyncHandler(async (req, res, next) => {
