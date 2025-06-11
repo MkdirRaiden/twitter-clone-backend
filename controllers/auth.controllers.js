@@ -21,7 +21,8 @@ const generateTokenAndSetCookie = (payload, user, req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: process.env.NODE_ENV !== "development",
-    sameSite: "none",
+    sameSite: "none",     // MUST match how it was set
+    path: "/",
   });
 };
 
@@ -71,7 +72,8 @@ export const logout = asyncHandler(async (req, res, next) => {
   res.clearCookie("jwt", {
     httpOnly: true,
     secure: process.env.NODE_ENV !== "development",
-    sameSite: "strict",
+    sameSite: "none",     // MUST match how it was set
+    path: "/",
   });
 
   res.status(200).json({
