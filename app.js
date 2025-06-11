@@ -37,8 +37,8 @@ app.use("/api", rateLimit({
 
 // Parsing
 app.use(cookieParser());
-app.use(express.json({ limit: "5mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 
 // use in development only

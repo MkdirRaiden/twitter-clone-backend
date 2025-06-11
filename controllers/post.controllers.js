@@ -14,6 +14,11 @@ import {
   updatePostValidationSchema,
 } from "../utils/validations/post.validations.js";
 
+// Shared populate config
+const postPopulate = [
+  { path: "user", select: "username profileImg fullName" },
+  { path: "comments.user", select: "username profileImg" },
+];
 
 //  Create post
 export const createPost = asyncHandler(async (req, res, next) => {
@@ -26,8 +31,10 @@ export const createPost = asyncHandler(async (req, res, next) => {
   const post = await Post.create({
     user: req.user._id,
     text,
-    img: imageUrl || "",
+    img: imageUrl,
   });
+
+  await post.populate("user", "username profileImg fullName");
 
   sendPostResponse(res, 201, post, undefined, "Post created successfully!");
 });
@@ -68,29 +75,21 @@ export const deletePost = asyncHandler(async (req, res, next) => {
   sendPostResponse(res, 200, undefined, undefined, "Post deleted successfully!");
 });
 
-//  Get all suggested posts
+//  Get all posts (For You feed)
 export const getSuggestedPosts = asyncHandler(async (req, res, next) => {
-  const currentUser = await User.findById(req.user._id).select("following");
-
-  const excludedUserIds = [req.user._id, ...currentUser.following];
-
   const { posts, page, totalPages } = await runPaginatedQuery({
     model: Post,
-    filter: { user: { $nin: excludedUserIds } }, // Exclude followed users and self
+    filter: {}, // Show all posts
     req,
     next,
     sort: { createdAt: -1 }, // Newest first
-    populate: [
-      { path: "user", select: "-password" },
-      { path: "comments.user", select: "-password" },
-    ],
+    populate: postPopulate,
   });
 
   sendPostResponse(res, 200, undefined, posts, undefined, page, totalPages);
 });
 
-
-// Get following users' posts
+//  Get following users' posts
 export const getFollowingPosts = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
@@ -99,29 +98,26 @@ export const getFollowingPosts = asyncHandler(async (req, res, next) => {
     filter: { user: { $in: user.following } },
     req,
     next,
-    populate: [
-      { path: "user", select: "-password" },
-      { path: "comments.user", select: "-password" },
-    ],
+    sort: { createdAt: -1 },
+    populate: postPopulate,
   });
 
   sendPostResponse(res, 200, undefined, posts, undefined, page, totalPages);
 });
 
-//  Get user posts
+//  Get user posts (profile)
 export const getUserPosts = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
   const user = await User.findOne({ username });
+  if (!user) return next(new CustomError("User not found", 404));
 
   const { posts, page, totalPages } = await runPaginatedQuery({
     model: Post,
     filter: { user: user._id },
     req,
     next,
-    populate: [
-      { path: "user", select: "-password" },
-      { path: "comments.user", select: "-password" },
-    ],
+    sort: { createdAt: -1 },
+    populate: postPopulate,
   });
 
   sendPostResponse(res, 200, undefined, posts, undefined, page, totalPages);
@@ -137,10 +133,8 @@ export const getLikedPosts = asyncHandler(async (req, res, next) => {
     filter: { _id: { $in: user.likedPosts } },
     req,
     next,
-    populate: [
-      { path: "user", select: "-password" },
-      { path: "comments.user", select: "-password" },
-    ],
+    sort: { createdAt: -1 },
+    populate: postPopulate,
   });
 
   sendPostResponse(res, 200, undefined, posts, undefined, page, totalPages);
@@ -156,12 +150,24 @@ export const commentOnPost = asyncHandler(async (req, res, next) => {
   post.comments.push({ text, user: req.user._id });
   await post.save();
 
+  // Optional: create notification
   if (!post.user.equals(req.user._id)) {
-    await Notification.create({ from: req.user._id, to: post.user, type: "comment" });
+    await Notification.create({
+      from: req.user._id,
+      to: post.user,
+      type: "comment",
+    });
   }
 
-  sendPostResponse(res, 200, undefined, undefined, "Comment added successfully!");
+  // ✅ Refetch the post with populated comments
+  const updatedPost = await Post.findById(post._id).populate([
+    { path: "user", select: "username profileImg fullName" },
+    { path: "comments.user", select: "username profileImg" },
+  ]);
+
+  sendPostResponse(res, 200, updatedPost, undefined, "Comment added successfully!");
 });
+
 
 //  Like/unlike post
 export const likeUnlikePost = asyncHandler(async (req, res, next) => {
@@ -192,5 +198,5 @@ export const getUserPostCounts = asyncHandler(async (req, res, next) => {
   if (!user) return next(new CustomError("User not found", 404));
 
   const count = await Post.countDocuments({ user: user._id });
-  res.status(200).json({ data: { postsCount: count } });
+  res.status(200).json({ data: { status: true, postsCount: count } });
 });

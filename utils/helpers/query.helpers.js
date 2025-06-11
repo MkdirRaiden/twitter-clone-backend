@@ -8,6 +8,7 @@ export const runPaginatedQuery = async ({
     req,
     next,
     populate = [],
+    sort = { createdAt: -1 }, // ← ADD DEFAULT sort
 }) => {
     const counts = await model.countDocuments(filter);
 
@@ -15,7 +16,7 @@ export const runPaginatedQuery = async ({
         return { posts: [], page: 1, totalPages: 0 };
     }
 
-    let queryBuilder = new ModelQuery(model.find(filter), req.query, counts)
+    let queryBuilder = new ModelQuery(model.find(filter).sort(sort), req.query, counts)
         .search()
         .paginate(next);
 
