@@ -58,6 +58,11 @@ twitter-clone-backend/
 
 ---
 
+## 🔗 Frontend
+
+The frontend of this app is available at:  
+👉 [twitter-clone-client Repo](https://github.com/MkdirRaiden/twitter-clone-client.git)
+
 ## ⚙️ Environment Variables
 
 Create a `.env` file in the root:

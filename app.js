@@ -49,6 +49,11 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 //   app.use(morgan("dev"));
 // }
 
+//root default route
+app.get("/", async (req, res) => {
+  res.send("Hello World!");
+})
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
