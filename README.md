@@ -63,6 +63,10 @@ twitter-clone-backend/
 The frontend of this app is available at:  
 👉 [twitter-clone-client Repo](https://github.com/MkdirRaiden/twitter-clone-client.git)
 
+## 📸 Postman API Screenshot
+
+![Postman API screenshot](./public/homepage-screenshot.png)
+
 ## 🌍 Live Demo
 
 https://twitter-clone-backend-f6w8.onrender.com/
